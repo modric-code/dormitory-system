@@ -2,13 +2,14 @@
 Django 项目全局配置文件
 包含：数据库、应用注册、模板、语言、静态文件、自定义用户模型等配置
 """
+import os
 from pathlib import Path
 
 # 项目根目录（manage.py 所在目录）
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# 安全密钥（开发环境使用，生产环境请更换）
-SECRET_KEY = 'django-insecure-a02-dormitory-campus-secret-key-2024'
+# 安全密钥：从环境变量读取，未设置时使用开发用占位密钥（勿用于生产）
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-dev-only-not-for-production')
 
 # 调试模式：开发时开启，部署上线必须关闭
 DEBUG = True
