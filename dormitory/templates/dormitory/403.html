@@ -1,0 +1,9 @@
+{% extends 'dormitory/base.html' %}
+{% block title %}无权限{% endblock %}
+{% block content %}
+<div class="text-center py-5">
+  <h1 class="display-1 text-danger">403</h1>
+  <p class="lead">抱歉，您没有权限访问该页面。</p>
+  <a href="{% url 'dashboard' %}" class="btn btn-primary">返回首页</a>
+</div>
+{% endblock %}

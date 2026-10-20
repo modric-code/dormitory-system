@@ -1,0 +1,54 @@
+{% extends 'dormitory/base.html' %}
+{% block title %}工单详情{% endblock %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-md-7">
+    <div class="card">
+      <div class="card-header bg-primary text-white">
+        工单详情（{{ repair.order_no }}）
+        <span class="badge bg-light text-dark float-end">{{ repair.get_status_display }}</span>
+      </div>
+      <div class="card-body">
+        <table class="table table-bordered mb-0">
+          <tr><th class="w-25">报修房间</th><td>{{ repair.room.dormitory.name }}-{{ repair.room.room_no }}</td></tr>
+          <tr><th>申请人</th><td>{{ repair.applicant.name }}（{{ repair.applicant.student_no }}）</td></tr>
+          <tr><th>报修类型</th><td>{{ repair.repair_type }}</td></tr>
+          <tr><th>报修日期</th><td>{{ repair.apply_date }}</td></tr>
+          <tr><th>问题描述</th><td>{{ repair.description }}</td></tr>
+          <tr><th>处理人</th><td>{{ repair.handler|default:"—" }}</td></tr>
+          <tr><th>维修进度</th><td>{{ repair.progress|default:"—" }}</td></tr>
+          <tr><th>完成日期</th><td>{{ repair.finish_date|default:"—" }}</td></tr>
+        </table>
+      </div>
+    </div>
+    <a href="{% url 'repair_list' %}" class="btn btn-secondary mt-3">返回列表</a>
+  </div>
+
+  {% if user.role == 'admin' %}
+  <div class="col-md-5">
+    <div class="card">
+      <div class="card-header bg-success text-white"><h6 class="mb-0">处理工单</h6></div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label">状态</label>
+            <select name="status" class="form-select">
+              <option value="待处理" {% if repair.status == '待处理' %}selected{% endif %}>待处理</option>
+              <option value="处理中" {% if repair.status == '处理中' %}selected{% endif %}>处理中</option>
+              <option value="已完成" {% if repair.status == '已完成' %}selected{% endif %}>已完成</option>
+              <option value="已驳回" {% if repair.status == '已驳回' %}selected{% endif %}>已驳回</option>
+            </select>
+          </div>
+          <div class="mb-3"><label class="form-label">处理人</label>
+            <input type="text" name="handler" value="{{ repair.handler }}" class="form-control"></div>
+          <div class="mb-3"><label class="form-label">维修进度说明</label>
+            <textarea name="progress" class="form-control" rows="3">{{ repair.progress }}</textarea></div>
+          <button type="submit" class="btn btn-success">保存</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

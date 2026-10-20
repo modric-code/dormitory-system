@@ -1,0 +1,79 @@
+{% extends 'dormitory/base.html' %}
+{% block title %}首页 - 宿舍管理系统{% endblock %}
+{% block content %}
+<h3 class="mb-4">欢迎，{{ user.username }}</h3>
+
+{% if user.role == 'admin' %}
+  {# 管理员工作台：整体概览 #}
+  <div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="card text-center text-bg-primary"><div class="card-body"><h2>{{ student_count }}</h2><div>学生总数</div></div></div></div>
+    <div class="col-md-3"><div class="card text-center text-bg-success"><div class="card-body"><h2>{{ dormitory_count }}</h2><div>宿舍楼</div></div></div></div>
+    <div class="col-md-3"><div class="card text-center text-bg-info"><div class="card-body"><h2>{{ room_count }}</h2><div>房间</div></div></div></div>
+    <div class="col-md-3"><div class="card text-center text-bg-warning"><div class="card-body"><h2>{{ occupied }}/{{ total_beds }}</h2><div>已住/总床位（入住率 {{ rate }}%）</div></div></div></div>
+  </div>
+  <div class="row g-3">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">维修待办</div>
+        <div class="card-body">
+          <p>待处理工单：<span class="badge bg-danger">{{ repair_pending }}</span>
+             处理中工单：<span class="badge bg-warning">{{ repair_doing }}</span></p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">最新工单</div>
+        <ul class="list-group list-group-flush">
+          {% for r in recent_repairs %}
+            <li class="list-group-item d-flex justify-content-between">
+              <span><a href="{% url 'repair_detail' r.pk %}">{{ r.order_no }} {{ r.repair_type }}</a> - {{ r.applicant.name }}</span>
+              <span class="badge bg-secondary">{{ r.get_status_display }}</span>
+            </li>
+          {% empty %}
+            <li class="list-group-item">暂无工单</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+{% else %}
+  {# 学生工作台：个人信息 + 我的报修 #}
+  <div class="row g-3">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">我的信息</div>
+        <div class="card-body">
+          {% if student %}
+            <p>姓名：{{ student.name }}（{{ student.student_no }}）</p>
+            <p>学院专业：{{ student.college }} {{ student.major }}</p>
+            <p>住宿状态：<span class="badge bg-{% if student.status == '在住' %}success{% else %}secondary{% endif %}">{{ student.status }}</span></p>
+            {% if checkin %}
+              <p>当前宿舍：{{ checkin.room.dormitory.name }} {{ checkin.room.room_no }}（{{ checkin.bed_no }}）</p>
+            {% else %}
+              <p class="text-muted">暂无入住记录，请联系管理员办理入住。</p>
+            {% endif %}
+          {% else %}
+            <p class="text-muted">未找到学生档案，请联系管理员。</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">我的报修</div>
+        <ul class="list-group list-group-flush">
+          {% for r in my_repairs %}
+            <li class="list-group-item d-flex justify-content-between">
+              <span><a href="{% url 'repair_detail' r.pk %}">{{ r.order_no }} {{ r.repair_type }}</a></span>
+              <span class="badge bg-secondary">{{ r.get_status_display }}</span>
+            </li>
+          {% empty %}
+            <li class="list-group-item">暂无报修记录</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+{% endif %}
+{% endblock %}

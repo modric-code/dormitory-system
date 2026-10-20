@@ -1,0 +1,59 @@
+{% extends 'dormitory/base.html' %}
+{% block title %}维修工单{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4>{% if user.role == 'admin' %}维修工单管理{% else %}我的报修{% endif %}</h4>
+  <div>
+    <a href="{% url 'repair_export' %}?status={{ status }}&type={{ rtype }}&keyword={{ keyword }}" class="btn btn-outline-success me-2">导出Excel</a>
+    <a href="{% url 'repair_add' %}" class="btn btn-primary">+ 申请维修</a>
+  </div>
+</div>
+
+<form method="get" class="row g-2 mb-3">
+  <div class="col-md-3"><input type="text" name="keyword" value="{{ keyword }}" class="form-control" placeholder="房号/申请人/描述"></div>
+  <div class="col-md-2">
+    <select name="type" class="form-select">
+      <option value="">全部类型</option>
+      <option value="水电" {% if rtype == '水电' %}selected{% endif %}>水电</option>
+      <option value="家具" {% if rtype == '家具' %}selected{% endif %}>家具</option>
+      <option value="门窗" {% if rtype == '门窗' %}selected{% endif %}>门窗</option>
+      <option value="网络" {% if rtype == '网络' %}selected{% endif %}>网络</option>
+      <option value="其他" {% if rtype == '其他' %}selected{% endif %}>其他</option>
+    </select>
+  </div>
+  <div class="col-md-2">
+    <select name="status" class="form-select">
+      <option value="">全部状态</option>
+      <option value="待处理" {% if status == '待处理' %}selected{% endif %}>待处理</option>
+      <option value="处理中" {% if status == '处理中' %}selected{% endif %}>处理中</option>
+      <option value="已完成" {% if status == '已完成' %}selected{% endif %}>已完成</option>
+      <option value="已驳回" {% if status == '已驳回' %}selected{% endif %}>已驳回</option>
+    </select>
+  </div>
+  <div class="col-md-3"><button type="submit" class="btn btn-outline-primary">查询</button>
+  <a href="{% url 'repair_list' %}" class="btn btn-outline-secondary">重置</a></div>
+</form>
+
+<table class="table table-striped table-hover">
+  <thead class="table-primary"><tr><th>工单号</th><th>楼栋-房间</th><th>申请人</th><th>类型</th><th>状态</th><th>报修日期</th><th>操作</th></tr></thead>
+  <tbody>
+    {% for r in page_obj %}
+      <tr>
+        <td>{{ r.order_no }}</td><td>{{ r.room.dormitory.name }}-{{ r.room.room_no }}</td>
+        <td>{{ r.applicant.name }}</td><td>{{ r.repair_type }}</td>
+        <td><span class="badge bg-{% if r.status == '待处理' %}danger{% elif r.status == '处理中' %}warning{% elif r.status == '已完成' %}success{% else %}secondary{% endif %}">{{ r.status }}</span></td>
+        <td>{{ r.apply_date }}</td>
+        <td>
+          <a href="{% url 'repair_detail' r.pk %}" class="btn btn-sm btn-outline-primary">详情</a>
+          {% if user.role == 'admin' %}
+            <a href="{% url 'repair_delete' r.pk %}" class="btn btn-sm btn-outline-danger">删除</a>
+          {% endif %}
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="7" class="text-center text-muted">暂无数据</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% include 'dormitory/pagination.html' %}
+{% endblock %}

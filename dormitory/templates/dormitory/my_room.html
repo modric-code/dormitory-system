@@ -1,0 +1,34 @@
+{% extends 'dormitory/base.html' %}
+{% block title %}我的宿舍{% endblock %}
+{% block content %}
+<h4 class="mb-4">我的宿舍</h4>
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card shadow">
+      <div class="card-header bg-primary text-white"><h5 class="mb-0">住宿信息</h5></div>
+      <div class="card-body">
+        {% if student %}
+          <table class="table table-bordered mb-0">
+            <tr><th class="w-25">姓名</th><td>{{ student.name }}</td></tr>
+            <tr><th>学号</th><td>{{ student.student_no }}</td></tr>
+            <tr><th>学院专业</th><td>{{ student.college }} {{ student.major }}</td></tr>
+            <tr><th>班级</th><td>{{ student.class_name }}</td></tr>
+            <tr><th>住宿状态</th>
+              <td><span class="badge bg-{% if student.status == '在住' %}success{% else %}secondary{% endif %}">{{ student.status }}</span></td></tr>
+            {% if checkin %}
+              <tr><th>宿舍楼</th><td>{{ checkin.room.dormitory.name }}</td></tr>
+              <tr><th>房间号</th><td>{{ checkin.room.room_no }}</td></tr>
+              <tr><th>床位</th><td>{{ checkin.bed_no }}</td></tr>
+              <tr><th>入住日期</th><td>{{ checkin.checkin_date }}</td></tr>
+            {% else %}
+              <tr><td colspan="2" class="text-center text-muted">暂无入住记录</td></tr>
+            {% endif %}
+          </table>
+        {% else %}
+          <p class="text-muted">未找到学生档案，请联系管理员。</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

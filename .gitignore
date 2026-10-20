@@ -1,0 +1,14 @@
+# Python 运行缓存
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Django 本地数据库（含测试账号数据，勿提交）
+db.sqlite3
+
+# 本地密钥
+.env
+
+# IDE
+.idea/
+.vscode/

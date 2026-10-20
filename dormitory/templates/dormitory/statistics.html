@@ -1,0 +1,87 @@
+{% extends 'dormitory/base.html' %}
+{% block title %}数据统计{% endblock %}
+{% block content %}
+<h4 class="mb-4">数据统计</h4>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3"><div class="card text-center text-bg-primary"><div class="card-body"><h2>{{ student_total }}</h2><div>学生总数</div></div></div></div>
+  <div class="col-md-3"><div class="card text-center text-bg-success"><div class="card-body"><h2>{{ student_in }}</h2><div>在住学生</div></div></div></div>
+  <div class="col-md-3"><div class="card text-center text-bg-info"><div class="card-body"><h2>{{ repair_total }}</h2><div>工单总数</div></div></div></div>
+  <div class="col-md-3"><div class="card text-center text-bg-warning"><div class="card-body"><h2>{{ overall_rate }}%</h2><div>总体入住率</div></div></div></div>
+</div>
+
+<div class="row g-3">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header"><h6 class="mb-0">各宿舍楼入住率</h6></div>
+      <div class="card-body">
+        <div id="dormChart" style="height: 320px;"></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header"><h6 class="mb-0">维修工单状态分布</h6></div>
+      <div class="card-body">
+        <div id="statusChart" style="height: 320px;"></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header"><h6 class="mb-0">维修工单类型分布</h6></div>
+      <div class="card-body">
+        <div id="typeChart" style="height: 320px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<script>
+  // 各宿舍楼入住率柱状图
+  var dormChart = echarts.init(document.getElementById('dormChart'));
+  dormChart.setOption({
+    tooltip: { trigger: 'axis', formatter: '{b}<br/>入住率：{c}%' },
+    grid: { left: 40, right: 20, top: 30, bottom: 30 },
+    xAxis: { type: 'category', data: [{% for d in dorm_stats %}'{{ d.name }}',{% endfor %}] },
+    yAxis: { type: 'value', max: 100, axisLabel: { formatter: '{value}%' } },
+    series: [{
+      type: 'bar',
+      data: [{% for d in dorm_stats %}{{ d.rate }},{% endfor %}],
+      itemStyle: { color: '#0d6efd' },
+      label: { show: true, position: 'top', formatter: '{c}%' },
+      barWidth: '45%'
+    }]
+  });
+
+  // 维修工单状态分布饼图
+  var statusChart = echarts.init(document.getElementById('statusChart'));
+  statusChart.setOption({
+    tooltip: { trigger: 'item', formatter: '{b}: {c} 单 ({d}%)' },
+    legend: { bottom: 0 },
+    series: [{
+      type: 'pie', radius: ['35%', '65%'], center: ['50%', '45%'],
+      data: [{% for r in repair_by_status %}{ value: {{ r.count }}, name: '{{ r.status }}' },{% endfor %}]
+    }]
+  });
+
+  // 维修工单类型分布饼图
+  var typeChart = echarts.init(document.getElementById('typeChart'));
+  typeChart.setOption({
+    tooltip: { trigger: 'item', formatter: '{b}: {c} 单 ({d}%)' },
+    legend: { bottom: 0 },
+    series: [{
+      type: 'pie', radius: '35%', center: ['50%', '45%'],
+      data: [{% for r in repair_by_type %}{ value: {{ r.count }}, name: '{{ r.repair_type }}' },{% endfor %}]
+    }]
+  });
+
+  // 窗口大小改变时图表自适应
+  window.addEventListener('resize', function() {
+    dormChart.resize();
+    statusChart.resize();
+    typeChart.resize();
+  });
+</script>
+{% endblock %}

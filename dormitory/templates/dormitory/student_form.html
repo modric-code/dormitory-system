@@ -1,0 +1,24 @@
+{% extends 'dormitory/base.html' %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card shadow">
+      <div class="card-header bg-primary text-white"><h5 class="mb-0">{{ title }}</h5></div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          {% include 'dormitory/form_fields.html' %}
+          {% if show_account %}
+            <hr><h6 class="text-muted">登录账号（选填，填写后该学生可用此账号登录）</h6>
+            <div class="mb-3"><label class="form-label">登录用户名</label><input type="text" name="username" class="form-control"></div>
+            <div class="mb-3"><label class="form-label">登录密码（留空默认 123456）</label><input type="text" name="password" class="form-control"></div>
+          {% endif %}
+          <button type="submit" class="btn btn-primary">保存</button>
+          <a href="{% url 'student_list' %}" class="btn btn-secondary">返回</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
